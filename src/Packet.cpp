@@ -26,10 +26,14 @@ namespace nbs {
 
         uint32_t subtype = 0;
         if (jsObject.Has("subtype")) {
-            subtype = jsObject.Get("subtype").As<Napi::Number>().Uint32Value();
+            if (jsObject.Get("subtype").IsNumber()) {
+                subtype = jsObject.Get("subtype").As<Napi::Number>().Uint32Value();
+            }
+            else if (!jsObject.Get("subtype").IsUndefined()) {
+                throw std::runtime_error("expected `subtype` to be a number");
+            }
         }
 
-        // Check types are valid
         uint64_t timestamp = 0;
         try {
             timestamp = timestamp::FromJsValue(jsObject.Get("timestamp"), env);
@@ -46,9 +50,6 @@ namespace nbs {
             throw std::runtime_error(std::string("error in `type`: ") + ex.what());
         }
 
-        if (!jsObject.Get("subtype").IsNumber()) {
-            throw std::runtime_error("expected `subtype` to be number");
-        }
         if (!jsObject.Get("payload").IsBuffer()) {
             throw std::runtime_error("expected `payload` to be buffer object");
         }

@@ -118,6 +118,19 @@ test('NbsEncoder.write() throws for invalid arguments', () => {
       'NbsEncoder.write() throws with incorrect types for timestamp properties'
     );
 
+    assert.throws(
+      () => {
+        encoder.write({
+          timestamp: { seconds: 1897, nanos: 0 },
+          type: pingType,
+          subtype: 'string',
+          payload: Buffer.from('ping.699', 'utf8'),
+        });
+      },
+      /invalid type for argument `packet`: expected `subtype` to be a number/,
+      'NbsEncoder.write() throws with incorrect type for subtype'
+    );
+
     encoder.close();
   });
 });
